@@ -1,105 +1,69 @@
 <template>
   <div class="container">
-    <h1>Buscar Estudiante</h1>
     <div class="consulta">
-      <h2>Consultar por id estudiante</h2>
-      <input v-model="id" type="text" placeholder="Ingrese id" />
-      <button @click="consultaPorId">Consultar</button>
-
-      <p>Nombre:</p>
-      <input v-model="nombre" type="text" />
-      <p>Apellido:</p>
-      <input v-model="apellido" type="text" />
-      <p>Información completa:</p>
-      <input v-model="linkC" type="text" />
-    </div>
-
-    <div class="insertar">
-      <h2>Ingreso de datos del estudiante</h2>
-
-      <div v-if="!isGet">
+      <h3>Datos que posee el estudiante</h3>
+      <input
+        v-if="showId"
+        class="id"
+        v-model="id"
+        type="text"
+        placeholder="Ingrese id"
+      />
+      <div v-if="txtBtn != 'Consultar'">
         <p>Nombre:</p>
-        <input v-model="nombre" type="text" placeholder="Ingrese nombre" />
+        <input v-model="nombre" type="text" placeholder="sección nombre" />
         <p>Apellido:</p>
-        <input v-model="apellido" type="text" placeholder="Ingrese apellido" />
+        <input v-model="apellido" type="text" placeholder="sección apellido" />
         <p>Género:</p>
-        <input v-model="genero" type="text" placeholder="Ingrese género" />
+        <input v-model="genero" type="text" placeholder="sección género" />
         <p>Fecha de nacimiento:</p>
         <input
           v-model="fechaNacimiento"
           type="datetime-local"
-          placeholder="Ingrese fecha de nacimiento"
+          placeholder="sección fecha de nacimiento"
         />
         <p>Hobby:</p>
-        <input v-model="hobby" type="text" placeholder="Ingrese hobby" />
+        <input v-model="hobby" type="text" placeholder="sección hobby" />
         <p>País:</p>
-        <input v-model="pais" type="text" placeholder="Ingrese país" />
+        <input v-model="pais" type="text" placeholder="sección país" />
         <p>Dirección:</p>
         <input
           v-model="direccion"
           type="text"
-          placeholder="Ingrese derección"
+          placeholder="sección derección"
         />
         <p>Tipo de estudiante:</p>
         <input
           v-model="tipoEstudiante"
           type="text"
-          placeholder="Ingrese tipo de estudiante"
+          placeholder="sección tipo de estudiante"
         />
         <p>Carrera:</p>
-        <input v-model="carrera" type="text" placeholder="Ingrese carrera" />
+        <input v-model="carrera" type="text" placeholder="sección carrera" />
         <p>Tipo de sangre:</p>
         <input
           v-model="tipoSangre"
           type="text"
-          placeholder="Ingrese tipo de sangre"
+          placeholder="sección tipo de sangre"
         />
-
-        <div class="btn-insert">
-          <button @click="insertar">Insertar</button>
-        </div>
       </div>
-      <button @click="showInputs" v-else>Mostrar campos</button>
-    </div>
-    <div>
-      <input v-model="id" type="text" placeholder="Ingrese id" />
-      <p>Nombre:</p>
-      <input v-model="nombre" type="text" placeholder="Ingrese nombre" />
-      <p>Apellido:</p>
-      <input v-model="apellido" type="text" placeholder="Ingrese apellido" />
-      <p>Género:</p>
-      <input v-model="genero" type="text" placeholder="Ingrese genero" />
-      <p>Fecha de nacimiento:</p>
-      <input
-        v-model="fechaNacimiento"
-        type="datetime-local"
-        placeholder="Ingrese fecha de nacimiento"
-      />
-      <p>Hobby:</p>
-      <input v-model="hobby" type="text" placeholder="Ingrese hobby" />
-      <p>País:</p>
-      <input v-model="pais" type="text" placeholder="Ingrese país" />
-      <p>Dirección:</p>
-      <input v-model="direccion" type="text" placeholder="Ingrese dirección" />
-      <p>Tipo de estudiante:</p>
-      <input
-        v-model="tipoEstudiante"
-        type="text"
-        placeholder="Ingrese tipo de estudiante"
-      />
-      <p>Carrera:</p>
-      <input v-model="carrera" type="text" placeholder="Ingrese carrera" />
-      <p>Tipo de sangre:</p>
-      <input
-        v-model="tipoSangre"
-        type="text"
-        placeholder="Ingrese tipo de sangre"
-      />
-      <button @click="actualizar">Actualizar</button>
-    </div>
-    <div>
-      <input v-model="id" type="text" placeholder="Ingrese id" />
-      <button @click="eliminar">Eliminar</button>
+
+      <div v-else>
+        <p>Nombre:</p>
+        <input v-model="nombre" type="text" placeholder="sección nombre" />
+        <p>Apellido:</p>
+        <input v-model="apellido" type="text" placeholder="sección apellido" />
+        <p>Información detallada:</p>
+        <input
+          v-model="linkC"
+          type="text"
+          placeholder="sección de información general"
+        />
+      </div>
+
+      <div class="btn">
+        <button @click="selectMethod">{{ txtBtn }}</button>
+      </div>
     </div>
   </div>
 </template>
@@ -109,10 +73,19 @@ import {
   consultarEstudianteFachada,
   insertarFacahada,
   actualizarFachada,
-  eliminarFachada,
 } from "../helpers/clienteEstudiante.js";
 
 export default {
+  props: {
+    txtBtn: {
+      type: String,
+      require: true,
+    },
+    showId: {
+      type: Boolean,
+      require: true,
+    },
+  },
   data() {
     return {
       id: null,
@@ -162,28 +135,32 @@ export default {
       };
       await actualizarFachada(this.id, estuBody);
     },
-    async eliminar() {
-      await eliminarFachada(this.id);
-    },
-    showInputs() {
-      this.clearVariables();
-      this.isGet = false;
-    },
-    clearVariables() {
-      this.id = null;
-      this.nombre = null;
-      this.apellido = null;
-      this.linkC = null;
+    async selectMethod() {
+      switch (this.txtBtn) {
+        case "Guardar":
+          await this.insertar();
+          break;
+        case "Actualizar":
+          await this.actualizar();
+          break;
+        case "Consultar":
+          await this.consultaPorId();
+          break;
+      }
     },
   },
 };
 </script>
 
-<style>
+<style scoped>
 .container {
   display: grid;
   justify-content: center;
   align-items: center;
+}
+
+.id {
+  margin-bottom: 30px;
 }
 
 .consulta,
@@ -211,7 +188,7 @@ button {
   margin: 5px;
 }
 
-.btn-insert {
+.btn {
   margin-top: 30px;
 }
 </style>
