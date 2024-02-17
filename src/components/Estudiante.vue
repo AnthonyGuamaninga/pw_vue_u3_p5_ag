@@ -149,6 +149,14 @@ export default {
       }
     },
   },
+  created(){
+    console.log(this.$route);
+    console.log(this.$route.params.id);
+    this.id = this.$route.params.id;
+    this.selectMethod();
+    console.log(this.$route.query.anio);
+    console.log(this.$route.query.edad);
+  },
 };
 </script>
 
